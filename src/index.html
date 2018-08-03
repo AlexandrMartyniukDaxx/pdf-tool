@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Template Editor</title>
+    <style>
+        .border {
+            border: 1.5px solid rgb(70, 70, 70);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root" class="p-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-row">
+                    <div class="w-50 pr-2">
+                        <div>HTML Markup</div>
+                        <textarea id="code"></textarea>
+                    </div>
+                    <div class="w-50 pl-2">
+                        <div>JSON Data</div>
+                        <textarea id="data"></textarea>
+                    </div>
+                </div>
+                <hr/>
+                <div>HTML Preview</div>
+                <div class="border">
+                    <iframe id="preview" class="w-100" style="border: 0;"></iframe>
+                </div>
+                <hr/>
+                <button id="get-pdf" class="btn btn-small btn-danger mt-3 mb-1">Generate PDF</button>
+                <div>
+                    <a id="pdf-download"></a>
+                    <br>
+                    <div class="border">
+                        <iframe id="pdf-preview" class="w-100" style="border: 0; height: 90vh;" onscroll="event.stopPropagation()"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
