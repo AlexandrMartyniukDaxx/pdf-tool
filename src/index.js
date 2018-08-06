@@ -3,7 +3,9 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/lesser-dark.css';
 import * as CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/htmlmixed/htmlmixed';
-import { fillTemplate } from './template-renderer';
+import 'codemirror/mode/handlebars/handlebars';
+import { Renderer } from './../common/renderer';
+
 
 let delay;
 let delayValue = 3000;
@@ -12,14 +14,22 @@ let dataValue = null;
 let currentMarkup = null;
 let currentPdfObject = null;
 
-
+const renderer = new Renderer('it');
 const textarea = document.getElementById('code');
 const previewFrame = document.getElementById('preview');
 const downloadPdf = document.getElementById('pdf-download');
 const previewPdf = document.getElementById('pdf-preview');
+const templateUpload = document.getElementById('template-upload');
+const dataUpload = document.getElementById('data-upload');
+const saveTemplate = document.getElementById('save-template');
+const saveData = document.getElementById('save-data');
+const download = document.getElementById('download');
 
 const editor = CodeMirror.fromTextArea(textarea, {
-    mode: 'text/html',
+    mode: {name: 'handlebars', base: 'text/html'},
+    matchBrackets: true,
+    autoCloseTags: true,
+    lineNumbers: true,
     theme: 'lesser-dark'
 });
 editor.on('change', function () {
@@ -29,6 +39,7 @@ editor.on('change', function () {
 
 const data = CodeMirror.fromTextArea(document.getElementById('data'), {
     mode: 'application/json',
+    lineNumbers: true,
     theme: 'lesser-dark'
 });
 data.on('change', function () {
@@ -44,18 +55,15 @@ data.on('change', function () {
 
 function updatePreview() {
     var preview = previewFrame.contentDocument || previewFrame.contentWindow.document;
+    currentMarkup = renderer.render(editor.getValue(), dataValue);
     preview.open();
-    preview.write(editor.getValue());
+    preview.write(currentMarkup);
     preview.close();
-    fillTemplate(preview.body, dataValue);
-    currentMarkup = preview.body.parentElement.innerHTML;
 }
 
 previewFrame.addEventListener('load', function (event) {
     this.style.height = this.contentWindow.document.body.offsetHeight + 'px';
 });
-
-setTimeout(updatePreview, delayValue);
 
 function getPdf() {
     fetch('/pdf', {
@@ -74,9 +82,68 @@ function showPdf(blob) {
     currentPdfObject = window.URL.createObjectURL(blob);
     downloadPdf.innerHTML = 'Download';
     downloadPdf.href = currentPdfObject;
-    downloadPdf.download = "file.pdf";
+    downloadPdf.download = 'file.pdf';
     previewPdf.src = currentPdfObject + '#view=fit&toolbar=0&navpanes=0';
     previewPdf.scrollIntoView(true);
 }
 
 document.getElementById('get-pdf').addEventListener('click', getPdf);
+
+function fetchData() {
+    Promise.all([
+        fetch('/assets/invoice/ee/data.json').then(res => res.text()),
+        fetch('/assets/invoice/ee/template.handlebars').then(res => res.text())
+    ]).then(res => {
+        editor.setValue(res[1]);
+        data.setValue(res[0]);
+    })
+}
+
+fetchData();
+
+templateUpload.addEventListener('change', uploadTemplate);
+dataUpload.addEventListener('change', uploadData)
+
+function uploadTemplate() {
+    const file = this.files[0];
+    const reader = new FileReader();
+
+    reader.addEventListener('load', (e) => {
+        editor.setValue(e.target.result);
+    })
+
+    reader.readAsText(file);
+}
+
+function uploadData() {
+    const file = this.files[0];
+    const reader = new FileReader();
+
+    reader.addEventListener('load', (e) => {
+        data.setValue(e.target.result);
+    })
+
+    reader.readAsText(file);
+}
+
+function downloadTemplate() {
+    const value = editor.getValue();
+    const filename = uploadTemplate.files && uploadTemplate.files[0].name || 'new-template.handlebars';
+    initDownload(value, filename);
+}
+
+function downloadData() {
+    const value = data.getValue();
+    const filename = dataUpload.files && dataUpload.files[0].name || 'data.handlebars.json';
+    initDownload(value, filename);
+}
+
+function initDownload(text, filename) {
+    const obj = URL.createObjectURL(new Blob([text]));
+    download.href = obj;
+    download.download = filename;
+    download.click();
+}
+
+saveTemplate.addEventListener('click', downloadTemplate);
+saveData.addEventListener('click', downloadData);

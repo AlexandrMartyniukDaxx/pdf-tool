@@ -8,6 +8,10 @@
         .border {
             border: 1.5px solid rgb(70, 70, 70);
         }
+
+        div.CodeMirror {
+            height: 100%;
+        }
     </style>
 </head>
 
@@ -15,14 +19,23 @@
     <div id="root" class="p-3">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex flex-row">
-                    <div class="w-50 pr-2">
+                <div class="d-flex flex-row" style="height:700px">
+                    <div class="w-50 pr-2 d-flex flex-column">
                         <div>HTML Markup</div>
-                        <textarea id="code"></textarea>
+                        <input type="file" class="my-1" id="template-upload">
+                        <div style="height: 580px;">
+                            <textarea id="code"></textarea>
+                        </div>
+                        <button id="save-template" class="btn btn-success my-1">Save</button>
                     </div>
-                    <div class="w-50 pl-2">
+                    <div class="w-50 pl-2 d-flex flex-column">
                         <div>JSON Data</div>
-                        <textarea id="data"></textarea>
+                        <input type="file" class="my-1" id="data-upload">
+                        <div style="height: 580px;">
+                            <textarea id="data"></textarea>
+                        </div>
+                        <button id="save-data" class="btn btn-success my-1">Save</button>
+                        <a id="download" hidden></a>
                     </div>
                 </div>
                 <hr/>

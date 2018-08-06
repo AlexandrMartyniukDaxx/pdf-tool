@@ -16,7 +16,7 @@ async function openPageAndSavePdf(url) {
   const page = await browser.newPage();
   await page.goto(url);
   const fileName = generateFileName() + '.pdf';
-  await page.pdf({ format: 'A4', path: 'tmp/' + fileName });
+  await page.pdf({ format: 'A4', path: 'tmp/' + fileName, margin: { left: '1cm', top: '1cm', right: '1cm', bottom: '2cm' } });
   await browser.close();
   return fileName;
 }
@@ -25,7 +25,7 @@ function cleanup(files) {
   if(files){
     if (Array.isArray(files)) {
       files.forEach(name => {
-        fs.unlink(path.resolve('tmp', name));
+        fs.unlink(path.resolve('tmp', name), (err) => { if(err) console.log('Failed to delete: ' + name, err)});
       });
     }
   } else {
