@@ -7,6 +7,7 @@ export class Renderer {
         Handlebars.registerHelper('number', this.formatter.decimal.bind(this.formatter));
         Handlebars.registerHelper('date', this.formatter.date.bind(this.formatter));
         Handlebars.registerHelper('boolean', this.formatter.boolean.bind(this.formatter));
+        Handlebars.registerHelper('json', this.formatter.json.bind(this.formatter));
     }
 
     render(template, value) {

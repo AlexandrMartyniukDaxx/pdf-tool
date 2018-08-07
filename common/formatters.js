@@ -30,4 +30,8 @@ export class Formatters {
     date(value, format) {
         return moment(value).format(format);
     }
+
+    json(value) {
+        return JSON.stringify(value, null, 0);
+    }
 }

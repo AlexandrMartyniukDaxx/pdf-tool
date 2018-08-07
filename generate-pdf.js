@@ -14,9 +14,10 @@ function saveHtmlFile(text) {
 async function openPageAndSavePdf(url) {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+  await page.setViewport({ width: 1140, height: 800});
   await page.goto(url);
   const fileName = generateFileName() + '.pdf';
-  await page.pdf({ format: 'A4', path: 'tmp/' + fileName, margin: { left: '1cm', top: '1cm', right: '1cm', bottom: '2cm' } });
+  await page.pdf({ format: 'A4', path: 'tmp/' + fileName, printBackground: true, margin: { left: '1cm', top: '1cm', right: '1cm', bottom: '2cm' } });
   await browser.close();
   return fileName;
 }

@@ -19,7 +19,13 @@ app.post('/pdf', textParser, async function (req, res) {
   const htmlName = await genPdf.saveHtmlFile(req.body);
   const url = `http://localhost:${port}/tmp/${htmlName}`;
   const pdfName = await genPdf.openPageAndSavePdf(url);
-  res.sendFile(path.resolve('tmp', pdfName));
+  res.sendFile(path.resolve('tmp', pdfName), null, (err) => {
+    if(err){
+      console.log(err);
+      res.sendStatus(500).send('Could not save')
+    }
+    genPdf.cleanup([htmlName, pdfName]);
+  });
 });
 
 app.post('/assets/*', textParser, async function (req, res) {

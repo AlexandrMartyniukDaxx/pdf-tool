@@ -26,7 +26,7 @@ const saveData = document.getElementById('save-data');
 const download = document.getElementById('download');
 
 const editor = CodeMirror.fromTextArea(textarea, {
-    mode: {name: 'handlebars', base: 'text/html'},
+    mode: { name: 'handlebars', base: 'text/html' },
     matchBrackets: true,
     autoCloseTags: true,
     lineNumbers: true,
@@ -88,11 +88,12 @@ function showPdf(blob) {
 }
 
 document.getElementById('get-pdf').addEventListener('click', getPdf);
+const uri = '/assets/consumes/gas/';
 
 function fetchData() {
     Promise.all([
-        fetch('/assets/invoice/ee/data.json').then(res => res.text()),
-        fetch('/assets/invoice/ee/template.handlebars').then(res => res.text())
+        fetch(uri + 'data.json').then(res => res.text()),
+        fetch(uri + 'template.handlebars').then(res => res.text())
     ]).then(res => {
         editor.setValue(res[1]);
         data.setValue(res[0]);
@@ -145,5 +146,11 @@ function initDownload(text, filename) {
     download.click();
 }
 
-saveTemplate.addEventListener('click', downloadTemplate);
+function uploadTemplate() {
+    const value = editor.getValue();
+    fetch(uri + 'template.handlebars', { method: 'POST', body: value })
+        .then(() => { });
+}
+
+saveTemplate.addEventListener('click', uploadTemplate);
 saveData.addEventListener('click', downloadData);
